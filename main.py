@@ -135,7 +135,7 @@ class CLI(cmd.Cmd):
             except (IndexError, ValueError):
                 print("[!] Error: Missing filename after '-f' or '-o'")
         else:
-            message = list(arg.lower())  # Convert to lowercase
+            message = arg.lower() # Convert to lowercase
             encoded_message = [self.key[self.alphabet.index(c)] if c in self.alphabet else c for c in message]
             print("".join(encoded_message))
 
@@ -145,7 +145,7 @@ class CLI(cmd.Cmd):
         print(''.join(self.alphabet))
 
         args = arg.split(' ')  # Handle multiple arguments properly
-        output_file = "decrypted.txt"  # Default output filename
+        output_file = "encrypted.txt"  # Default output filename
 
         if '-f' in args:
                     try:
@@ -173,7 +173,7 @@ class CLI(cmd.Cmd):
                     except (IndexError, ValueError):
                         print("[!] Error: Missing filename after '-f' or '-o'")
         else:
-            message = list(arg.lower())  
+            message = arg.lower()
             decoded_message = [self.alphabet[self.key.index(c)] if c in self.key else c for c in message]
             print("".join(decoded_message))
 # runtime starts here
