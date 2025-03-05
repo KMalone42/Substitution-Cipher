@@ -2,6 +2,7 @@ import array as arr
 import random
 import time
 import cmd
+import os
 
 class CLI(cmd.Cmd):
     alphabet = arr.array('u', ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
@@ -100,37 +101,81 @@ class CLI(cmd.Cmd):
             print("Key not initialized try 'keygen' or 'keygen -m' for manual key generation")
             return False
 
-
-    # encrypt a message using the key
     def do_encrypt(self, arg):
-        # obligatory check for a key being loaded
         if not self.whatiskey():
             return
         print(''.join(self.alphabet))
-        message = list(arg)
-        encoded_message = []
-        for char in message:
-            index = self.alphabet.index(char)
-            encoded_message.append(self.key[index])
-        
-        print(''.join(map(str, encoded_message)))
 
+        args = arg.split(' ')  # Handle multiple arguments properly
+        output_file = "encrypted.txt"  # Default output filename
 
-    
-    # decrypt a message using the key
+        if '-f' in args:
+            try:
+                file_index = args.index('-f') + 1
+                filename = args[file_index]
+
+                if not os.path.exists(filename):
+                    print(f"[!] File '{filename}' not found.")
+                    return
+                with open(filename, 'r', encoding='utf-8') as file:
+                    plaintext = file.read().lower()  # Convert to lowercase
+
+                # Encrypt the text
+                encrypted_text = ''.join(self.key[self.alphabet.index(c)] if c in self.alphabet else c for c in plaintext)
+
+                if '-o' in args:
+                    output_index = args.index('-o') + 1
+                    if output_index < len(args):
+                        output_file = args[output_index]  # Set the custom output filename
+
+                # Save to file
+                with open(output_file, 'w', encoding='utf-8') as file:
+                    file.write(encrypted_text)
+                print(f"[✓] Encrypted content saved to '{output_file}'")
+            except (IndexError, ValueError):
+                print("[!] Error: Missing filename after '-f' or '-o'")
+        else:
+            message = list(arg.lower())  # Convert to lowercase
+            encoded_message = [self.key[self.alphabet.index(c)] if c in self.alphabet else c for c in message]
+            print("".join(encoded_message))
+
     def do_decrypt(self, arg):
-        # obligatory check for a key being loaded
         if not self.whatiskey():
             return
         print(''.join(self.alphabet))
-        message = list(arg)
-        decoded_message = []
-        for char in message:
-            index = self.key.index(char)
-            decoded_message.append(self.alphabet[index])
-        
-        print(''.join(map(str, decoded_message)))
 
+        args = arg.split(' ')  # Handle multiple arguments properly
+        output_file = "decrypted.txt"  # Default output filename
+
+        if '-f' in args:
+                    try:
+                        file_index = args.index('-f') + 1
+                        filename = args[file_index]
+
+                        if not os.path.exists(filename):
+                            print(f"[!] File '{filename}' not found.")
+                            return
+                        with open(filename, 'r', encoding='utf-8') as file:
+                            ciphertext = file.read().lower()
+
+                        # Decrypt the text
+                        decrypted_text = ''.join(self.alphabet[self.key.index(c)] if c in self.key else c for c in ciphertext)
+
+                        if '-o' in args:
+                            output_index = args.index('-o') + 1
+                            if output_index < len(args):
+                                output_file = args[output_index]  # Set the custom output filename
+
+                        # Save to file
+                        with open(output_file, 'w', encoding='utf-8') as file:
+                            file.write(decrypted_text)
+                        print(f"[✓] decrypted content saved to '{output_file}'")
+                    except (IndexError, ValueError):
+                        print("[!] Error: Missing filename after '-f' or '-o'")
+        else:
+            message = list(arg.lower())  
+            decoded_message = [self.alphabet[self.key.index(c)] if c in self.key else c for c in message]
+            print("".join(decoded_message))
 # runtime starts here
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
